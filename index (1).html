@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة مركز أوراق - سري</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;font-family:'Tajawal',sans-serif}body{margin:0;background:#0f1a18;padding:20px}
+.box{max-width:850px;margin:auto;background:#fff;border-radius:12px;padding:26px;color:#1a1a1a}
+h2{border-bottom:2px solid #b8963e;padding-bottom:10px;margin-bottom:18px}
+label{font-weight:800;font-size:13px;margin-top:14px;display:block}input,select,textarea{width:100%;padding:12px;border:1px solid #ccc;border-radius:8px;margin-top:6px}
+textarea{height:90px}.btn{background:#14201d;color:#b8963e;border:0;padding:12px;border-radius:8px;width:100%;font-weight:800;cursor:pointer;margin-top:12px}
+#login{max-width:380px;margin:120px auto;background:#fff;padding:30px;border-radius:12px;text-align:center}
+</style>
+</head>
+<body>
+<div id="login"><h3>🔒 دخول إدارة أوراق</h3><input type="password" id="pass" placeholder="كلمة المرور" style="margin:15px 0"><button class="btn" onclick="check()">دخول</button><p style="font-size:11px;opacity:.5;margin-top:10px">الرمز: aurak2026</p></div>
+
+<div id="panel" class="box" style="display:none">
+<h2>لوحة التحكم السرية - مركز أوراق</h2>
+
+<h3 style="color:#b8963e;margin-top:10px">أولاً: معلومات المركز (تظهر في الصفحة الرئيسية)</h3>
+<label>المقدمة تحت العنوان</label><textarea id="f_intro"></textarea>
+<label>تعريف المركز</label><textarea id="f_tareef"></textarea>
+<label>رسالتنا</label><textarea id="f_resala"></textarea>
+<label>رؤيتنا</label><textarea id="f_roaya"></textarea>
+<button class="btn" onclick="saveInfo()">حفظ معلومات المركز</button>
+
+<hr style="margin:30px 0">
+
+<h3 style="color:#b8963e">ثانياً: نشر بحث جديد</h3>
+<label>عنوان البحث</label><input id="f_title">
+<label>التصنيف</label><select id="f_cat"><option>بحوث استراتيجية</option><option>دراسات تاريخية</option><option>علوم إسلامية وحياتية</option><option>تقرير مرئي / فيديو</option></select>
+<label>رابط صورة أو فيديو</label><input id="f_media" placeholder="https://...">
+<label>نص البحث</label><textarea id="f_content" style="height:140px"></textarea>
+<button class="btn" onclick="addPost()">نشر البحث الآن</button>
+
+<h3 style="margin-top:30px">المنشورات الحالية</h3><div id="list"></div>
+<a href="index.html" style="display:block;text-align:center;margin-top:20px;color:#b8963e">معاينة الموقع الرئيسي</a>
+</div>
+
+<script>
+const PW="aurak2026";
+function check(){if(document.getElementById('pass').value===PW){document.getElementById('login').style.display='none';document.getElementById('panel').style.display='block';load();}else alert('خطأ');}
+function getInfo(){return JSON.parse(localStorage.getItem("awraq_info"))||{intro:"مركز متخصص في البحوث الاستراتيجية والدراسات التاريخية المعمقة، وبحوث في كافة المجالات الإسلامية والحياتية.",tareef:"مركز أوراق هو مؤسسة بحثية مستقلة تُعنى بإنتاج المعرفة الرصينة وتوثيقها.",resala:"تقديم دراسات وتقارير استراتيجية تخدم الباحث وصانع القرار.",roaya:"أن نكون مرجعاً علمياً رصيناً في مجال البحوث الاستراتيجية والتاريخية."}}
+function load(){
+ let i=getInfo();document.getElementById('f_intro').value=i.intro;document.getElementById('f_tareef').value=i.tareef;document.getElementById('f_resala').value=i.resala;document.getElementById('f_roaya').value=i.roaya;render();
+}
+function saveInfo(){
+ let obj={intro:document.getElementById('f_intro').value,tareef:document.getElementById('f_tareef').value,resala:document.getElementById('f_resala').value,roaya:document.getElementById('f_roaya').value};
+ localStorage.setItem("awraq_info",JSON.stringify(obj));alert('تم حفظ معلومات المركز');
+}
+function getPosts(){return JSON.parse(localStorage.getItem("aurak_posts"))||[]}
+function render(){let p=getPosts();document.getElementById('list').innerHTML=p.length? p.map((x,i)=>`<div style="display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:8px"><b>${x.title}</b><button onclick="del(${i})" style="background:#e74c3c;color:#fff;border:0;padding:4px 10px;border-radius:5px;cursor:pointer">حذف</button></div>`).join(''):"<p style='opacity:.5'>لا يوجد</p>"}
+function addPost(){
+ let posts=getPosts();posts.unshift({title:document.getElementById('f_title').value,category:document.getElementById('f_cat').value,media:document.getElementById('f_media').value,content:document.getElementById('f_content').value,date:new Date().toLocaleDateString('ar-EG')});
+ localStorage.setItem("aurak_posts",JSON.stringify(posts));document.getElementById('f_title').value='';document.getElementById('f_content').value='';render();alert('تم النشر');
+}
+function del(i){if(confirm('حذف؟')){let p=getPosts();p.splice(i,1);localStorage.setItem("aurak_posts",JSON.stringify(p));render();}}
+</script>
+</body>
+</html>
